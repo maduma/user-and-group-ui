@@ -1,0 +1,24 @@
+<div>
+  <input
+    [(ngModel)]="searchPattern"
+    (ngModelChange)="getSearch($event)"
+    placeholder="Search">
+</div>
+<div>
+  <ul>
+    <li *ngFor="let item of items" (click)="remove(item)">
+      {{item.name}}
+    </li>
+  </ul>
+</div>
+<h2>Search Content</h2>
+<div>
+  <ul>
+    <li *ngFor="let item of searchItems" (click)="add(item)">
+      {{item.name}}
+    </li>
+  </ul>
+</div>
+<h2>Action</h2>
+<button [disabled]="!isChanged" (click)="cancel()">Cancel</button>
+<button [disabled]="!isChanged" (click)="save()">Save</button>
