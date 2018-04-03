@@ -1,5 +1,5 @@
 import { Component, OnInit, Input} from '@angular/core';
-import { Item } from '../item';
+import { Item, Action, Method } from '../item';
 import { SetService } from '../set.service';
 
 function setInclude(items: Item[], searchItem: Item) {
@@ -34,16 +34,16 @@ function removeItem(items: Item[], item: Item) {
   }
 }
 
-function diff(original: Item[], current: Item[]) {
-  const actions = [];
+function diff(original: Item[], current: Item[]): Action[] {
+  const actions: Action[] = [];
   current.map(item => {
-    if (!setInclude(original, item) {
-      actions.push({'action': 'create', 'value': item});
+    if (!setInclude(original, item)) {
+      actions.push({'method': Method.Create, 'value': item});
     }
   });
   original.map(item => {
-    if (!setInclude(current, item) {
-      actions.push({'action': 'delete', 'value': item});
+    if (!setInclude(current, item)) {
+      actions.push({'method': Method.Delete, 'value': item});
     }
   });
   return actions;
@@ -64,7 +64,7 @@ export class SeteditComponent implements OnInit {
   hash: string;
   isChanged: boolean;
   originalItems: Item[];
-  changes: string[] = [];
+  changes: Action[] = [];
 
   constructor(private setService: SetService) { }
 
@@ -109,7 +109,7 @@ export class SeteditComponent implements OnInit {
   }
 
   save(): void {
-    const actions = diff(this.originalItems, this.items);
+    const actions: Action[] = diff(this.originalItems, this.items);
     this.setService.save(actions);
     this.ngOnInit();
   }

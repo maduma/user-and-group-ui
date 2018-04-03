@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Item } from './item';
+import { Item, Action, Method } from './item';
 import { DEVELOPERS, PEOPLE } from './mock-set';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -41,13 +41,13 @@ export class SetService {
     */
   }
 
-  save(actions) {
+  save(actions: Action[]) {
     console.log(actions);
     actions.map( action => {
-      if (action.action === 'create') {
+      if (action.method === Method.Create) {
         console.log('create', action.value);
       }
-      if (action.action === 'delete') {
+      if (action.method === Method.Delete) {
         console.log('delete', action.value);
       }
     });
