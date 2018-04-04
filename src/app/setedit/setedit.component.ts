@@ -1,6 +1,13 @@
 import { Component, OnInit, Input} from '@angular/core';
 import { Item, Action, Method } from '../item';
 import { SetService } from '../set.service';
+import { Subject }    from 'rxjs/Subject';
+import { of }         from 'rxjs/observable/of';
+import {
+  debounceTime, distinctUntilChanged, switchMap
+} from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs/Observable';
 
 function setInclude(items: Item[], searchItem: Item) {
   const index = items.findIndex(
@@ -65,6 +72,8 @@ export class SeteditComponent implements OnInit {
   isChanged: boolean;
   originalItems: Item[];
   changes: Action[] = [];
+  private searchTerms = new Subject<string>();
+  toto$: Observable<string>;
 
   constructor(private setService: SetService) { }
 
@@ -78,7 +87,13 @@ export class SeteditComponent implements OnInit {
         this.originalItems = this.items.slice();
       });
     this.searchPattern = '';
-    this.getSearch();
+    this.toto$ = this.searchTerms.pipe(
+      tap(term => console.log('log', term)),
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => this.search(term)),
+    );
+    //this.getSearch('');
   }
 
   add(item: Item): void {
@@ -95,15 +110,22 @@ export class SeteditComponent implements OnInit {
     this.isChanged = this.hash !== getHash(this.items);
   }
 
-  getSearch(): void {
-    this.setService.searchItems(this.searchPattern)
+  search(pattern) {
+    console.log('search' + pattern)
+    this.setService.searchItems(pattern)
       .subscribe(items => {
         this.searchItems = items;
         this.searchItems = reduce(this.searchItems, this.items);
       sort(this.searchItems);
     });
+    return of('');
   }
   
+  getSearch(pattern): void {
+    console.log('add', pattern)
+    this.searchTerms.next(pattern);
+  }
+
   cancel(): void {
     this.ngOnInit();
   }
